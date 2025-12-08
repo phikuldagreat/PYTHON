@@ -24,7 +24,8 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         
     def _setup_window(self):
         self.setWindowTitle("S.P.E.A.K - Admin Dashboard")
-        self.setGeometry(100, 100, 1200, 700)
+        self.showFullScreen()
+        #self.setGeometry(100, 100, 1200, 700)
         
     def _setup_ui(self):
         central = QWidget()
@@ -354,4 +355,5 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
                     QMessageBox.information(self, "Status Updated", message)
                     self.load_complaints()
                 else:
+
                     QMessageBox.warning(self, "Update Failed", message)
