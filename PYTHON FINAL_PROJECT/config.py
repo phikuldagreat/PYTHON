@@ -2,7 +2,6 @@
 #Made by the people, made for the people
 
 #DATABASE CONFIGURATION / LOGIN INFO
-#DATABASE CONFIGURATION / LOGIN INFO
 
 DB_CONFIG = {
     'host': 'localhost',

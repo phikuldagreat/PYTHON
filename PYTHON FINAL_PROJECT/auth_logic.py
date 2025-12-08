@@ -2,7 +2,6 @@
 #Made by the people, made for the people
 
 #HANDLES ALL LOGIC RELATED TO AUTHENTICATION
-#HANDLES ALL LOGIC RELATED TO AUTHENTICATION
 
 from database import Database
 from config import DB_CONFIG
@@ -11,8 +10,7 @@ from config import DB_CONFIG
 class AuthValidator: #VALIDATOR FOR AUTH LOGIC
     
     @staticmethod
-    def validate_login(username, password):
-        """Validate login credentials."""
+    def validate_login(username, password): #VALIDATE LOGIN DATA
         if not username or not password:
             return False, "Please enter both School ID and password."
         
@@ -28,10 +26,10 @@ class AuthValidator: #VALIDATOR FOR AUTH LOGIC
         
         for field in required_fields:
             if not student_data.get(field):
-                return False, "Please fill in all required fields marked with *"
+                return False, "Please fill in all required fields marked with <span style='color: red;'>*</span>"
         
         email = student_data['email']
-        if '@' not in email or '.' not in email:
+        if '@' not in email or '.' not in email or '@umindanao.edu.ph' not in email:
             return False, "Please enter a valid email address."
         
         password = student_data['password']

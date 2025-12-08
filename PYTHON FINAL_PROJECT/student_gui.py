@@ -1,8 +1,7 @@
 #S.P.E.A.K - System for Public Empowerment and Knowledge
 #Made by the people, made for the people
 
-#THIS IS THE GUI FOR THE STUDENT'S DASHBOARD
-#THIS IS THE GUI FOR THE STUDENT'S DASHBOARD
+#GUI FOR STUDENT'S DASHBOARD
 
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
@@ -14,8 +13,7 @@ from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QFont, QColor
 
 
-class SubmitComplaintDialog(QDialog):
-    """Dialog for submitting a new complaint."""
+class SubmitComplaintDialog(QDialog): #DIALOG FOR SUBMITTING NEW COMPLAINT
     
     COMPLAINT_CATEGORIES = [
         "Facilities Issue",
@@ -32,13 +30,12 @@ class SubmitComplaintDialog(QDialog):
         self.setFixedSize(500, 450)
         self._setup_ui()
         
-    def _setup_ui(self):
-        """Build dialog UI."""
+    def _setup_ui(self): #DIALOG UI
         layout = QVBoxLayout(self)
         layout.setSpacing(15)
         layout.setContentsMargins(20, 20, 20, 20)
         
-        # Title
+        #TITLE
         title = QLabel("Submit a Complaint")
         title_font = QFont()
         title_font.setPointSize(14)
@@ -46,35 +43,35 @@ class SubmitComplaintDialog(QDialog):
         title.setFont(title_font)
         layout.addWidget(title)
         
-        # Category
-        layout.addWidget(QLabel("Category: *"))
+        #CATEGORY
+        layout.addWidget(QLabel("Category: <span style='color: red;'>*</span>"))
         self.category_combo = QComboBox()
         self.category_combo.addItems(self.COMPLAINT_CATEGORIES)
         self.category_combo.setMinimumHeight(35)
         layout.addWidget(self.category_combo)
         
-        # Subject
-        layout.addWidget(QLabel("Subject: *"))
+        #REASON
+        layout.addWidget(QLabel("Subject: <span style='color: red;'>*</span>"))
         self.subject_input = QLineEdit()
         self.subject_input.setPlaceholderText("Brief description of the issue")
         self.subject_input.setMinimumHeight(35)
         layout.addWidget(self.subject_input)
         
-        # Location
-        layout.addWidget(QLabel("Location: *"))
+        #LOCATION
+        layout.addWidget(QLabel("Location: <span style='color: red;'>*</span>"))
         self.location_input = QLineEdit()
         self.location_input.setPlaceholderText("e.g., Lab 1, Room 301, Building A")
         self.location_input.setMinimumHeight(35)
         layout.addWidget(self.location_input)
         
-        # Description
-        layout.addWidget(QLabel("Detailed Description: *"))
+        #DESCRIPTION
+        layout.addWidget(QLabel("Detailed Description: <span style='color: red;'>*</span>"))
         self.description_input = QTextEdit()
         self.description_input.setPlaceholderText("Provide detailed information about your complaint...")
         self.description_input.setMinimumHeight(120)
         layout.addWidget(self.description_input)
         
-        # Buttons
+        #BUTTONS
         button_box = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         )
@@ -82,8 +79,7 @@ class SubmitComplaintDialog(QDialog):
         button_box.rejected.connect(self.reject)
         layout.addWidget(button_box)
         
-    def validate_and_accept(self):
-        """Validate input before accepting."""
+    def validate_and_accept(self): #INPUT VALIDATOR / SIMPLY CHECKS IF FIELDS ARE BLANK
         if not self.subject_input.text().strip():
             QMessageBox.warning(self, "Validation Error", "Please enter a subject.")
             return
@@ -98,8 +94,7 @@ class SubmitComplaintDialog(QDialog):
         
         self.accept()
     
-    def get_complaint_data(self):
-        """Get the complaint data from the form."""
+    def get_complaint_data(self): #GET COMPLAINT DATA FROM INPUT FIELDS
         return {
             'category': self.category_combo.currentText(),
             'subject': self.subject_input.text().strip(),
@@ -108,8 +103,7 @@ class SubmitComplaintDialog(QDialog):
         }
 
 
-class EditComplaintDialog(QDialog):
-    """Dialog for editing an existing complaint."""
+class EditComplaintDialog(QDialog): #CLASS FOR EDITING COMPLAINTS
     
     def __init__(self, complaint_data, parent=None):
         super().__init__(parent)
@@ -119,13 +113,12 @@ class EditComplaintDialog(QDialog):
         self._setup_ui()
         self._populate_data()
         
-    def _setup_ui(self):
-        """Build dialog UI."""
+    def _setup_ui(self): #DIALOG UI
         layout = QVBoxLayout(self)
         layout.setSpacing(15)
         layout.setContentsMargins(20, 20, 20, 20)
         
-        # Title
+        #TITLE
         title = QLabel("Edit Complaint")
         title_font = QFont()
         title_font.setPointSize(14)
@@ -133,32 +126,32 @@ class EditComplaintDialog(QDialog):
         title.setFont(title_font)
         layout.addWidget(title)
         
-        # Category
-        layout.addWidget(QLabel("Category: *"))
+        #CATEGORY
+        layout.addWidget(QLabel("Category: <span style='color: red;'>*</span>"))
         self.category_combo = QComboBox()
         self.category_combo.addItems(SubmitComplaintDialog.COMPLAINT_CATEGORIES)
         self.category_combo.setMinimumHeight(35)
         layout.addWidget(self.category_combo)
         
-        # Subject
-        layout.addWidget(QLabel("Subject: *"))
+        #SUBJECT
+        layout.addWidget(QLabel("Subject: <span style='color: red;'>*</span>"))
         self.subject_input = QLineEdit()
         self.subject_input.setMinimumHeight(35)
         layout.addWidget(self.subject_input)
         
-        # Location
-        layout.addWidget(QLabel("Location: *"))
+        #LOCATION
+        layout.addWidget(QLabel("Location: <span style='color: red;'>*</span>"))
         self.location_input = QLineEdit()
         self.location_input.setMinimumHeight(35)
         layout.addWidget(self.location_input)
         
-        # Description
-        layout.addWidget(QLabel("Detailed Description: *"))
+        #DESCRIPTION
+        layout.addWidget(QLabel("Detailed Description: <span style='color: red;'>*</span>"))
         self.description_input = QTextEdit()
         self.description_input.setMinimumHeight(120)
         layout.addWidget(self.description_input)
         
-        # Buttons
+        #BUTTONS
         button_box = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel
         )
@@ -166,15 +159,13 @@ class EditComplaintDialog(QDialog):
         button_box.rejected.connect(self.reject)
         layout.addWidget(button_box)
         
-    def _populate_data(self):
-        """Populate form with existing data."""
+    def _populate_data(self): #POPULATE FIELDS WITH EXISTING COMPLAINT DATA
         self.category_combo.setCurrentText(self.complaint_data.get('category', ''))
         self.subject_input.setText(self.complaint_data.get('subject', ''))
         self.location_input.setText(self.complaint_data.get('location', ''))
         self.description_input.setPlainText(self.complaint_data.get('description', ''))
         
-    def validate_and_accept(self):
-        """Validate input before accepting."""
+    def validate_and_accept(self): #CHECKS IF FIELDS ARE BLANK
         if not self.subject_input.text().strip():
             QMessageBox.warning(self, "Validation Error", "Please enter a subject.")
             return
@@ -189,8 +180,7 @@ class EditComplaintDialog(QDialog):
         
         self.accept()
     
-    def get_complaint_data(self):
-        """Get the updated complaint data."""
+    def get_complaint_data(self): #GET UPDATED COMPLAINT DATA FROM INPUT FIELDS
         return {
             'category': self.category_combo.currentText(),
             'subject': self.subject_input.text().strip(),
@@ -199,7 +189,7 @@ class EditComplaintDialog(QDialog):
         }
 
 
-class StudentDashboard(QMainWindow): #FOR STUDENTS
+class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
     
     logout_requested = pyqtSignal()
     
@@ -224,23 +214,22 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
         main_layout.setSpacing(20)
         main_layout.setContentsMargins(30, 20, 30, 20)
         
-        # Header
+        #HEADER
         self._add_header(main_layout)
         
-        # Action buttons
+        #ACTION BUTTONS
         self._add_action_buttons(main_layout)
         
-        # My Complaints table
+        #COMPLAINTS TABLE
         self._add_complaints_table(main_layout)
         
-        # Details panel
+        #COMPLAINT DETAILS PANEL
         self._add_details_panel(main_layout)
         
-    def _add_header(self, layout):
-        """Add header with title and user info."""
+    def _add_header(self, layout): #HEADER SECTION
         header_layout = QHBoxLayout()
         
-        # Title
+        #TITLE
         title = QLabel("My Complaints")
         title_font = QFont()
         title_font.setPointSize(18)
@@ -250,14 +239,14 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
         
         header_layout.addStretch()
         
-        # User info
+        #USER INFORMATION
         self.user_label = QLabel("Student: Not logged in")
         user_font = QFont()
         user_font.setPointSize(10)
         self.user_label.setFont(user_font)
         header_layout.addWidget(self.user_label)
         
-        # Logout button
+        #LOGOUT BUTTON
         logout_btn = QPushButton("Logout")
         logout_btn.setMaximumWidth(100)
         logout_btn.clicked.connect(self.logout_requested.emit)
@@ -268,7 +257,7 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
     def _add_action_buttons(self, layout): #ADD ACTION BUTTONS
         button_layout = QHBoxLayout()
         
-        # Submit complaint button
+        #SUBMIT COMPLAINT BUTTON
         self.submit_btn = QPushButton("Submit New Complaint")
         self.submit_btn.setMinimumHeight(40)
         self.submit_btn.setStyleSheet("""
@@ -288,15 +277,14 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
         
         button_layout.addStretch()
         
-        # Refresh button
+        #REFRESH BUTTON
         refresh_btn = QPushButton("Refresh")
         refresh_btn.clicked.connect(self.load_my_complaints)
         button_layout.addWidget(refresh_btn)
         
         layout.addLayout(button_layout)
         
-    def _add_complaints_table(self, layout):
-        """Add complaints table."""
+    def _add_complaints_table(self, layout): #ADD COMPLAINTS TABLE
         table_label = QLabel("My Submitted Complaints")
         label_font = QFont()
         label_font.setPointSize(12)
@@ -310,7 +298,7 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
             "ID", "Category", "Subject", "Location", "Status", "Date"
         ])
         
-        # Set column widths
+        #COLUMN WIDTHS
         header = self.complaints_table.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
@@ -326,8 +314,7 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
         
         layout.addWidget(self.complaints_table)
         
-    def _add_details_panel(self, layout):
-        """Add complaint details and action buttons."""
+    def _add_details_panel(self, layout): #ADD COMPLAINT DETAILS PANEL
         details_label = QLabel("Complaint Details")
         label_font = QFont()
         label_font.setPointSize(12)
@@ -343,22 +330,22 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
         details_layout = QVBoxLayout(details_frame)
         details_layout.setContentsMargins(15, 15, 15, 15)
         
-        # Details text
+        #DETAILS TEXT AREA
         self.details_text = QTextEdit()
         self.details_text.setReadOnly(True)
         self.details_text.setPlaceholderText("Select a complaint to view details...")
         details_layout.addWidget(self.details_text)
         
-        # Action buttons
+        #ACTION BUTTONS
         button_layout = QHBoxLayout()
         button_layout.addStretch()
         
-        self.edit_btn = QPushButton("✏️ Edit")
+        self.edit_btn = QPushButton("Edit")
         self.edit_btn.setEnabled(False)
         self.edit_btn.clicked.connect(self.edit_complaint)
         button_layout.addWidget(self.edit_btn)
         
-        self.delete_btn = QPushButton("🗑️ Delete")
+        self.delete_btn = QPushButton("Delete")
         self.delete_btn.setEnabled(False)
         self.delete_btn.setStyleSheet("QPushButton { background-color: #f44336; color: white; padding: 8px 20px; }")
         self.delete_btn.clicked.connect(self.delete_complaint)
@@ -370,8 +357,7 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
         self.selected_complaint_id = None
         self.selected_complaint_status = None
         
-    def set_user(self, user_data):
-        """Set the logged-in user."""
+    def set_user(self, user_data): #SET CURRENT USER INFORMATION
         self.current_user = user_data
         full_name = f"{user_data['first_name']} {user_data['last_name']}"
         self.user_label.setText(f"Student: {full_name}")
@@ -382,11 +368,11 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
         if dialog.exec() == QDialog.DialogCode.Accepted:
             complaint_data = dialog.get_complaint_data()
             
-            # Add student information
+            #ADD STUDENT INFO
             complaint_data['school_id'] = self.current_user['school_id']
             complaint_data['program'] = self.current_user['program']
             
-            # Submit to database
+            #SUBMIT TO DATABASE
             success, message, complaint_id = self.db.submit_complaint(complaint_data)
             
             if success:
@@ -395,7 +381,7 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
                     "Complaint Submitted",
                     message
                 )
-                # RELOAD COMPLAINTS
+                #RE LOAD COMPLAINTS
                 self.load_my_complaints()
             else:
                 QMessageBox.critical(
@@ -431,7 +417,7 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
         if dialog.exec() == QDialog.DialogCode.Accepted:
             updated_data = dialog.get_complaint_data()
             
-            # Update in database
+            #UPDATE IN DATABASE
             success, message = self.db.update_complaint(
                 self.selected_complaint_id, 
                 updated_data
@@ -443,7 +429,7 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
                     "Complaint Updated",
                     message
                 )
-                # RELOAD COMPLAINTS
+                #RE LOAD COMPLAINTS
                 self.load_my_complaints()
             else:
                 QMessageBox.warning(
@@ -473,7 +459,7 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
         )
         
         if reply == QMessageBox.StandardButton.Yes:
-            # Delete from database
+            #DELETE FROM DATABASE
             success, message = self.db.delete_complaint(self.selected_complaint_id)
             
             if success:
@@ -482,7 +468,7 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
                     "Complaint Deleted",
                     message
                 )
-                # RELOAD COMPLAINTS
+                #RE LOAD COMPLAINTS
                 self.load_my_complaints()
             else:
                 QMessageBox.warning(
@@ -495,11 +481,11 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
         if not self.current_user:
             return
         
-        # Get complaints from database
+        #GET COMPLAINTS FROM DATABASE
         complaints = self.db.get_student_complaints(self.current_user['school_id'])
         
-        # Convert to tuple format expected by display_complaints
-        # (id, category, subject, location, status, date, description)
+        #Convert to tuple format expected by display_complaints
+        #(id, category, subject, location, status, date, description)
         formatted_complaints = [
             (
                 complaint['id'],
@@ -515,8 +501,7 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
         
         self.display_complaints(formatted_complaints)
         
-    def display_complaints(self, complaints):
-        """Display complaints in the table."""
+    def display_complaints(self, complaints): #DISPLAY COMPLAINTS IN TABLE
         self.complaints_table.setRowCount(len(complaints))
         self.all_complaints = complaints
         
@@ -524,8 +509,8 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
             for col in range(6):
                 item = QTableWidgetItem(str(complaint[col]))
                 
-                # Color code status
-                if col == 4:  # Status column
+                #COLOR CODE
+                if col == 4:  #STATUS COLUMN
                     if complaint[col] == "Pending":
                         item.setForeground(QColor("#ff9800"))
                     elif complaint[col] == "In Progress":
@@ -535,8 +520,7 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
                 
                 self.complaints_table.setItem(row, col, item)
         
-    def on_complaint_selected(self):
-        """Handle complaint selection."""
+    def on_complaint_selected(self): #HANDLES COMPLAINT SELECTION FROM TABLE
         selected = self.complaints_table.selectedItems()
         if not selected:
             self.details_text.clear()
@@ -550,20 +534,18 @@ class StudentDashboard(QMainWindow): #FOR STUDENTS
         self.selected_complaint_id = complaint[0]
         self.selected_complaint_status = complaint[4]
         
-        # Display details
+        #DISPLAY DETAILS
         details = f"""Category: {complaint[1]}
-Subject: {complaint[2]}
-Location: {complaint[3]}
-Status: {complaint[4]}
-Date Submitted: {complaint[5]}
-
-Description:
-{complaint[6]}
-"""
+                    Subject: {complaint[2]}
+                    Location: {complaint[3]}
+                    Status: {complaint[4]}
+                    Date Submitted: {complaint[5]}
+                    Description: {complaint[6]}
+                    """
         
         self.details_text.setText(details.strip())
         
-        # Enable/disable buttons based on status
+        #ENABLE/DISABLE EDIT & DELETE BUTTONS BASED ON STATUS
         if complaint[4] == "Pending":
             self.edit_btn.setEnabled(True)
             self.delete_btn.setEnabled(True)

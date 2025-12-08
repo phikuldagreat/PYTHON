@@ -1,8 +1,7 @@
 #S.P.E.A.K - System for Public Empowerment and Knowledge
 #Made by the people, made for the people
 
-#GUI FOR LOGIN AND REGISTRATION WINDOWS
-#GUI FOR LOGIN AND REGISTRATION WINDOWS
+#LOGIN AND REGISTRATION WINDOW GUI
 
 from PyQt6.QtWidgets import (
     QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, 
@@ -19,10 +18,13 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
     
     #PROGRAMS IN CCE DEPARTMENT
     PROGRAMS = [
-        "Bachelor of Science in Computer Science",
-        "Bachelor of Science in Information Technology",
-        "Bachelor of Science in Information Systems",
-        "Bachelor of Science in Computer Engineering"
+        "BS Computer Science",
+        "BS Information Technology",
+        "BS Information Systems",
+        "BS Library and Information Science",
+        "BS EMC - Digital Animation",
+        "BS EMC - Game Development",
+        "Bachelor of Multimedia Arts"
     ]
     
     YEAR_LEVELS = ["1st Year", "2nd Year", "3rd Year", "4th Year"]
@@ -60,7 +62,7 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
         
         main_layout.addWidget(scroll)
         
-    def _add_title(self, layout):
+    def _add_title(self, layout): #TITLE AND SUBTITLE
         title = QLabel("Student Registration")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title_font = QFont()
@@ -79,21 +81,20 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
         
         layout.addSpacing(20)
         
-    def _add_form_fields(self, layout):
-        #REGISTRATION FORM FIELDS
-        layout.addWidget(QLabel("School ID: *"))
+    def _add_form_fields(self, layout): #REGISTRATION FORM FIELDS
+        layout.addWidget(QLabel("School ID: <span style='color: red;'>*</span>"))
         self.school_id_input = QLineEdit()
         self.school_id_input.setPlaceholderText("e.g., 560055") 
         self.school_id_input.setMinimumHeight(35)
         layout.addWidget(self.school_id_input)
         
-        layout.addWidget(QLabel("School Email: *"))
+        layout.addWidget(QLabel("School Email: <span style='color: red;'>*</span>"))
         self.email_input = QLineEdit()
-        self.email_input.setPlaceholderText("your.email@example.com")
+        self.email_input.setPlaceholderText("name.schoolid@umindanao.edu.ph")
         self.email_input.setMinimumHeight(35)
         layout.addWidget(self.email_input)
         
-        layout.addWidget(QLabel("First Name: *"))
+        layout.addWidget(QLabel("First Name: <span style='color: red;'>*</span>"))
         self.fname_input = QLineEdit()
         self.fname_input.setPlaceholderText("Enter first name")
         self.fname_input.setMinimumHeight(35)
@@ -103,41 +104,41 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
         self.mi_input = QLineEdit()
         self.mi_input.setPlaceholderText("M.I. (optional)")
         self.mi_input.setMinimumHeight(35)
-        self.mi_input.setMaxLength(2)
+        self.mi_input.setMaxLength(35)
         layout.addWidget(self.mi_input)
         
-        layout.addWidget(QLabel("Last Name: *"))
+        layout.addWidget(QLabel("Last Name: <span style='color: red;'>*</span>"))
         self.lname_input = QLineEdit()
         self.lname_input.setPlaceholderText("Enter last name")
         self.lname_input.setMinimumHeight(35)
         layout.addWidget(self.lname_input)
         
-        layout.addWidget(QLabel("Contact Number: *"))
+        layout.addWidget(QLabel("Contact Number: <span style='color: red;'>*</span>"))
         self.contact_input = QLineEdit()
         self.contact_input.setPlaceholderText("09XX-XXX-XXXX")
         self.contact_input.setMinimumHeight(35)
         layout.addWidget(self.contact_input)
         
-        layout.addWidget(QLabel("Program: *"))
+        layout.addWidget(QLabel("Program: <span style='color: red;'>*</span>"))
         self.program_combo = QComboBox()
         self.program_combo.addItems(self.PROGRAMS)
         self.program_combo.setMinimumHeight(35)
         layout.addWidget(self.program_combo)
         
-        layout.addWidget(QLabel("Year Level: *"))
+        layout.addWidget(QLabel("Year Level: <span style='color: red;'>*</span>"))
         self.year_combo = QComboBox()
         self.year_combo.addItems(self.YEAR_LEVELS)
         self.year_combo.setMinimumHeight(35)
         layout.addWidget(self.year_combo)
         
-        layout.addWidget(QLabel("Password: *"))
+        layout.addWidget(QLabel("Password: <span style='color: red;'>*</span>"))
         self.password_input = QLineEdit()
         self.password_input.setPlaceholderText("Create a password")
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
         self.password_input.setMinimumHeight(35)
         layout.addWidget(self.password_input)
         
-        layout.addWidget(QLabel("Confirm Password: *"))
+        layout.addWidget(QLabel("Confirm Password: <span style='color: red;'>*</span>"))
         self.confirm_password_input = QLineEdit()
         self.confirm_password_input.setPlaceholderText("Re-enter password")
         self.confirm_password_input.setEchoMode(QLineEdit.EchoMode.Password)
@@ -146,8 +147,7 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
         
         layout.addSpacing(10)
         
-    def _add_buttons(self, layout):
-        #REGISTER AND BACK BUTTONS
+    def _add_buttons(self, layout): #REGISTER AND BACK BUTTONS
         self.register_btn = QPushButton("Register")
         self.register_btn.setMinimumHeight(45)
         self.register_btn.setCursor(Qt.CursorShape.PointingHandCursor)

@@ -2,7 +2,6 @@
 #Made by the people, made for the people
 
 #MAIN APPLICATION FILE
-#MAIN APPLICATION FILE
 
 from PyQt6.QtWidgets import QApplication
 from auth_gui import LoginWindow, RegisterWindow
@@ -19,53 +18,55 @@ class AuthController:
         self.register_window = RegisterWindow()
         self.admin_dashboard = AdminDashboard()
         
-        # Don't create student_dashboard here - create it after login
-        self.student_dashboard = None  # Initialize as None
+        self.student_dashboard = None  #STUDENT DASHBOARD IS INITIALIZED AS NONE
         
         self._connect_signals()
         
-    def _connect_signals(self):
-        # Login window signals
+    def _connect_signals(self): #SIGNALS TO CALL GUI METHODS
+        #LOGIN WINDOW SIGNALS
         self.login_window.login_clicked.connect(self.handle_login)
         self.login_window.register_requested.connect(self.show_register_window)
         self.login_window.admin_login_requested.connect(self.handle_admin_login)
         
-        # Register window signals
+        #REGISTER WINDOW SIGNALS
         self.register_window.registration_complete.connect(self.handle_registration)
         self.register_window.back_to_login.connect(self.show_login_window)
         
-        # Admin dashboard signals
+        #ADMIN DASHBOARD SIGNALS
         self.admin_dashboard.logout_requested.connect(self.show_login_window)
     
-    def handle_login(self, username, password):
-        # Check if admin login
+    def handle_login(self, username, password): #HANDLES LOGIN FOR STUDENT
         if username.lower() == "admin":
-            self.handle_admin_login(password)
+            self.handle_admin_login(password) #IF USERNAME IS ADMIN, CALL ADMIN LOGIN METHOD
             return
             
         success, message, user_data = self.auth_service.login(username, password)
         
         if success:
+            #HIDE LOGIN WINDOW AND CLEAR FIELDS
             self.login_window.hide()
             self.login_window.clear_fields()
             
-            # Create NEW student dashboard with user_data and db
+            #CREATE NEW STUDENT DASHBOARD INSTANCE
             self.student_dashboard = StudentDashboard(user_data, self.auth_service.db)
             
-            # Connect logout signal
+            #CONNECT LOGOUT SIGNAL
             self.student_dashboard.logout_requested.connect(self.show_login_window)
             
-            # Show dashboard
+            #SHOW STUDENT DASHBOARD
             self.student_dashboard.show()
         else:
             self.login_window.show_error("Login Failed", message)
     
-    def handle_admin_login(self, password):
+    def handle_admin_login(self, password): #HANDLES ADMIN LOGIN
         if password == "admin123":
+            print("Admin password correct")
             self.login_window.hide()
             self.login_window.clear_fields()
             self.admin_dashboard.set_admin("Administrator")
+            print("Loading complaints...")
             self.admin_dashboard.load_complaints()
+            print("Complaints loaded successfully")
             self.admin_dashboard.show()
         else:
             self.login_window.show_error("Access Denied", "Invalid admin credentials")
@@ -80,20 +81,20 @@ class AuthController:
             else:
                 self.register_window.show_error("Registration Failed", message)
         except Exception as e:
-            print(f"Registration error: {e}")  # DEBUG
+            print(f"Registration error: {e}")
             import traceback
-            traceback.print_exc()  # DEBUG - shows full error
+            traceback.print_exc()
             self.register_window.show_error("Error", f"An error occurred: {str(e)}")
     
-    def show_register_window(self):
+    def show_register_window(self): #SHOWS REGISTRATION WINDOW
         self.login_window.hide()
         self.register_window.show()
     
-    def show_login_window(self):
+    def show_login_window(self): #SHOWS LOGIN WINDOW
         self.register_window.hide()
         self.admin_dashboard.hide()
         
-        # Hide student dashboard if it exists
+        #HIDE STUDENT DASHBOARD IF IT EXISTS
         if self.student_dashboard:
             self.student_dashboard.hide()
         

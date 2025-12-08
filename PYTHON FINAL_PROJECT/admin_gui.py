@@ -2,7 +2,6 @@
 #Made by the people, made for the people
 
 #ADMIN'S DASHBOARD GUI
-#ADMIN'S DASHBOARD GUI
 
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
@@ -36,35 +35,29 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         main_layout.setContentsMargins(30, 20, 30, 20)
         
         self._add_header(main_layout)
-        
         self._add_filters(main_layout)
-        
         self._add_complaints_table(main_layout)
-        
         self._add_details_panel(main_layout)
+        self._add_bottom_buttons(main_layout)
         
     def _add_header(self, layout):
         header_layout = QHBoxLayout()
         
-        title = QLabel("Complaint Management Dashboard")
+        self.admin_label = QLabel("Admin: Not logged in")
+        admin_font = QFont()
+        admin_font.setPointSize(12)
+        admin_font.setBold(True)
+        self.admin_label.setFont(admin_font)
+        header_layout.addWidget(self.admin_label)
+        
+        header_layout.addStretch()
+        
+        title = QLabel("Dashboard - Admin")
         title_font = QFont()
         title_font.setPointSize(18)
         title_font.setBold(True)
         title.setFont(title_font)
         header_layout.addWidget(title)
-        
-        header_layout.addStretch()
-        
-        self.admin_label = QLabel("Admin: Not logged in")
-        admin_font = QFont()
-        admin_font.setPointSize(10)
-        self.admin_label.setFont(admin_font)
-        header_layout.addWidget(self.admin_label)
-        
-        logout_btn = QPushButton("Logout")
-        logout_btn.setMaximumWidth(100)
-        logout_btn.clicked.connect(self.logout_requested.emit)
-        header_layout.addWidget(logout_btn)
         
         layout.addLayout(header_layout)
         
@@ -74,24 +67,35 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         filter_frame.setStyleSheet("QFrame { background-color: #f5f5f5; border-radius: 5px; }")
         
         filter_layout = QHBoxLayout(filter_frame)
-        filter_layout.setContentsMargins(15, 10, 15, 10)
+        filter_layout.setContentsMargins(15, 15, 15, 15)
         
-        filter_layout.addWidget(QLabel("Filter by Program:"))
+        filter_program_label = QLabel("Filter by Program:")
+        filter_program_label.setFont(QFont("Arial", 12))
+        filter_layout.addWidget(filter_program_label)
+        
         self.program_filter = QComboBox()
         self.program_filter.addItems([
             "All Programs",
-            "Bachelor of Science in Computer Science",
-            "Bachelor of Science in Information Technology",
-            "Bachelor of Science in Information Systems",
-            "Bachelor of Science in Computer Engineering"
+            "BS Computer Science",
+            "BS Information Technology",
+            "BS Information Systems",
+            "BS Library and Information Science",
+            "BS EMC - Digital Animation",
+            "BS EMC - Game Development",
+            "Bachelor of Multimedia Arts"
         ])
         self.program_filter.currentTextChanged.connect(self.filter_complaints)
-        self.program_filter.setMinimumWidth(300)
+        self.program_filter.setMinimumWidth(400)
+        self.program_filter.setMinimumHeight(40)
+        self.program_filter.setFont(QFont("Arial", 11))
         filter_layout.addWidget(self.program_filter)
         
-        filter_layout.addSpacing(20)
+        filter_layout.addSpacing(30)
         
-        filter_layout.addWidget(QLabel("Filter by Status:"))
+        filter_status_label = QLabel("Filter by Status:")
+        filter_status_label.setFont(QFont("Arial", 12))
+        filter_layout.addWidget(filter_status_label)
+        
         self.status_filter = QComboBox()
         self.status_filter.addItems([
             "All Status",
@@ -100,11 +104,17 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
             "Resolved"
         ])
         self.status_filter.currentTextChanged.connect(self.filter_complaints)
+        self.status_filter.setMinimumWidth(200)
+        self.status_filter.setMinimumHeight(40)
+        self.status_filter.setFont(QFont("Arial", 11))
         filter_layout.addWidget(self.status_filter)
         
         filter_layout.addStretch()
         
         refresh_btn = QPushButton("Refresh")
+        refresh_btn.setMinimumWidth(150)
+        refresh_btn.setMinimumHeight(40)
+        refresh_btn.setFont(QFont("Arial", 11))
         refresh_btn.clicked.connect(self.load_complaints)
         filter_layout.addWidget(refresh_btn)
         
@@ -139,7 +149,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         
         layout.addWidget(self.complaints_table)
         
-    def _add_details_panel(self, layout): #COMPLAINT DETAILS AND ACTIONS PANEL
+    def _add_details_panel(self, layout): #COMPLAINT DETAILS PANEL (without buttons)
         details_label = QLabel("Complaint Details")
         label_font = QFont()
         label_font.setPointSize(12)
@@ -150,7 +160,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         details_frame = QFrame()
         details_frame.setFrameStyle(QFrame.Shape.StyledPanel)
         details_frame.setStyleSheet("QFrame { background-color: #f9f9f9; border-radius: 5px; }")
-        details_frame.setMaximumHeight(200)
+        details_frame.setMaximumHeight(150)
         
         details_layout = QVBoxLayout(details_frame)
         details_layout.setContentsMargins(15, 15, 15, 15)
@@ -158,38 +168,64 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         self.details_text = QTextEdit()
         self.details_text.setReadOnly(True)
         self.details_text.setPlaceholderText("Select a complaint to view details...")
+        self.details_text.setMaximumHeight(120)
         details_layout.addWidget(self.details_text)
         
-        button_layout = QHBoxLayout()
-        button_layout.addStretch()
-        
-        self.in_progress_btn = QPushButton("Mark as In Progress")
-        self.in_progress_btn.setEnabled(False)
-        self.in_progress_btn.clicked.connect(lambda: self.update_status("In Progress"))
-        button_layout.addWidget(self.in_progress_btn)
-        
-        self.resolve_btn = QPushButton("Mark as Resolved")
-        self.resolve_btn.setEnabled(False)
-        self.resolve_btn.setStyleSheet("QPushButton { background-color: #4CAF50; color: white; padding: 8px 20px; }")
-        self.resolve_btn.clicked.connect(lambda: self.update_status("Resolved"))
-        button_layout.addWidget(self.resolve_btn)
-        
-        details_layout.addLayout(button_layout)
         layout.addWidget(details_frame)
         
         self.selected_complaint_id = None
+        
+    def _add_bottom_buttons(self, layout): #BOTTOM BUTTONS LAYOUT
+        bottom_layout = QHBoxLayout()
+        
+        left_buttons_layout = QHBoxLayout()
+        
+        self.in_progress_btn = QPushButton("Mark as In Progress")
+        self.in_progress_btn.setEnabled(False)
+        self.in_progress_btn.setMinimumWidth(180)
+        self.in_progress_btn.setMinimumHeight(45)
+        self.in_progress_btn.setFont(QFont("Arial", 11))
+        self.in_progress_btn.clicked.connect(lambda: self.update_status("In Progress"))
+        left_buttons_layout.addWidget(self.in_progress_btn)
+        
+        self.resolve_btn = QPushButton("Mark as Resolved")
+        self.resolve_btn.setEnabled(False)
+        self.resolve_btn.setMinimumWidth(180)
+        self.resolve_btn.setMinimumHeight(45)
+        self.resolve_btn.setFont(QFont("Arial", 11))
+        self.resolve_btn.setStyleSheet("QPushButton { background-color: #4CAF50; color: white; padding: 8px 20px; }")
+        self.resolve_btn.clicked.connect(lambda: self.update_status("Resolved"))
+        left_buttons_layout.addWidget(self.resolve_btn)
+        
+        bottom_layout.addLayout(left_buttons_layout)
+        bottom_layout.addStretch()
+        
+        logout_btn = QPushButton("Logout")
+        logout_btn.setMinimumWidth(150)
+        logout_btn.setMinimumHeight(45)
+        logout_btn.setFont(QFont("Arial", 11))
+        logout_btn.setStyleSheet("QPushButton { background-color: #f44336; color: white; padding: 8px 20px; }")
+        logout_btn.clicked.connect(self.logout_requested.emit)
+        bottom_layout.addWidget(logout_btn)
+        
+        layout.addLayout(bottom_layout)
         
     def set_admin(self, admin_name):
         self.current_admin = admin_name
         self.admin_label.setText(f"Admin: {admin_name}")
         
     def load_complaints(self):
+        print("load_complaints called")
         from database import Database
         from config import DB_CONFIG
         
+        print(f"DB_CONFIG: {DB_CONFIG}")
         db = Database(**DB_CONFIG)
+        print(f"Database object created")
         if db.connect():
+            print("Connected to database")
             complaints_data = db.get_all_complaints()
+            print(f"Got {len(complaints_data)} complaints")
             db.close()
             
             complaints = []
@@ -267,19 +303,16 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         self.selected_complaint_id = complaint_id
         
         details = f"""
-Complaint ID: {complaint['id']}
-Student ID: {complaint['school_id']}
-Program: {complaint['program']}
-Status: {complaint['status']}
-Date Submitted: {complaint['date']}
-Category: {complaint['category']}
-Location: {complaint['location']}
-
-Subject: {complaint['subject']}
-
-Description:
-{complaint['description']}
-        """
+                Complaint ID: {complaint['id']}
+                Student ID: {complaint['school_id']}
+                Program: {complaint['program']}
+                Status: {complaint['status']}
+                Date Submitted: {complaint['date']}
+                Category: {complaint['category']}
+                Location: {complaint['location']}
+                Subject: {complaint['subject']}
+                Description: {complaint['description']}
+                """
         
         self.details_text.setText(details.strip())
         

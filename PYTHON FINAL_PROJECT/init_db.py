@@ -2,7 +2,6 @@
 #Made by the people, made for the people
 
 #RUN FILE ONCE TO INITIALIZE THE DATABASE
-#RUN FILE ONCE TO INITIALIZE THE DATABASE
 
 from database import Database
 
