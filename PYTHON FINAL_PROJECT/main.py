@@ -54,7 +54,7 @@ class AuthController:
             self.student_dashboard.logout_requested.connect(self.show_login_window)
             
             #SHOW STUDENT DASHBOARD
-            self.student_dashboard.show()
+            self.student_dashboard.showFullScreen()
         else:
             self.login_window.show_error("Login Failed", message)
     
@@ -67,7 +67,7 @@ class AuthController:
             print("Loading complaints...")
             self.admin_dashboard.load_complaints()
             print("Complaints loaded successfully")
-            self.admin_dashboard.show()
+            self.admin_dashboard.showFullScreen()
         else:
             self.login_window.show_error("Access Denied", "Invalid admin credentials")
     
