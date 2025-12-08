@@ -226,8 +226,21 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         #COMPLAINT DETAILS PANEL
         self._add_details_panel(main_layout)
         
+        #BOTTOM BUTTONS
+        self._add_bottom_buttons(main_layout)
+        
     def _add_header(self, layout): #HEADER SECTION
         header_layout = QHBoxLayout()
+        
+        #USER INFORMATION
+        self.user_label = QLabel("Student: Not logged in")
+        user_font = QFont()
+        user_font.setPointSize(12)
+        user_font.setBold(True)
+        self.user_label.setFont(user_font)
+        header_layout.addWidget(self.user_label)
+        
+        header_layout.addStretch()
         
         #TITLE
         title = QLabel("My Complaints")
@@ -237,29 +250,16 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         title.setFont(title_font)
         header_layout.addWidget(title)
         
-        header_layout.addStretch()
-        
-        #USER INFORMATION
-        self.user_label = QLabel("Student: Not logged in")
-        user_font = QFont()
-        user_font.setPointSize(10)
-        self.user_label.setFont(user_font)
-        header_layout.addWidget(self.user_label)
-        
-        #LOGOUT BUTTON
-        logout_btn = QPushButton("Logout")
-        logout_btn.setMaximumWidth(100)
-        logout_btn.clicked.connect(self.logout_requested.emit)
-        header_layout.addWidget(logout_btn)
-        
         layout.addLayout(header_layout)
         
     def _add_action_buttons(self, layout): #ADD ACTION BUTTONS
         button_layout = QHBoxLayout()
         
-        #SUBMIT COMPLAINT BUTTON
+        #SUBMIT COMPLAINT BUTTON (enlarged)
         self.submit_btn = QPushButton("Submit New Complaint")
-        self.submit_btn.setMinimumHeight(40)
+        self.submit_btn.setMinimumHeight(45)
+        self.submit_btn.setMinimumWidth(220)
+        self.submit_btn.setFont(QFont("Arial", 11))
         self.submit_btn.setStyleSheet("""
             QPushButton {
                 background-color: #2196F3;
@@ -279,6 +279,9 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         
         #REFRESH BUTTON
         refresh_btn = QPushButton("Refresh")
+        refresh_btn.setMinimumWidth(150)
+        refresh_btn.setMinimumHeight(45)
+        refresh_btn.setFont(QFont("Arial", 11))
         refresh_btn.clicked.connect(self.load_my_complaints)
         button_layout.addWidget(refresh_btn)
         
@@ -314,7 +317,7 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         
         layout.addWidget(self.complaints_table)
         
-    def _add_details_panel(self, layout): #ADD COMPLAINT DETAILS PANEL
+    def _add_details_panel(self, layout): #ADD COMPLAINT DETAILS PANEL (without buttons)
         details_label = QLabel("Complaint Details")
         label_font = QFont()
         label_font.setPointSize(12)
@@ -325,7 +328,7 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         details_frame = QFrame()
         details_frame.setFrameStyle(QFrame.Shape.StyledPanel)
         details_frame.setStyleSheet("QFrame { background-color: #f9f9f9; border-radius: 5px; }")
-        details_frame.setMaximumHeight(180)
+        details_frame.setMaximumHeight(150)
         
         details_layout = QVBoxLayout(details_frame)
         details_layout.setContentsMargins(15, 15, 15, 15)
@@ -334,28 +337,48 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         self.details_text = QTextEdit()
         self.details_text.setReadOnly(True)
         self.details_text.setPlaceholderText("Select a complaint to view details...")
+        self.details_text.setMaximumHeight(120)  # Constrain height
         details_layout.addWidget(self.details_text)
         
-        #ACTION BUTTONS
-        button_layout = QHBoxLayout()
-        button_layout.addStretch()
-        
-        self.edit_btn = QPushButton("Edit")
-        self.edit_btn.setEnabled(False)
-        self.edit_btn.clicked.connect(self.edit_complaint)
-        button_layout.addWidget(self.edit_btn)
-        
-        self.delete_btn = QPushButton("Delete")
-        self.delete_btn.setEnabled(False)
-        self.delete_btn.setStyleSheet("QPushButton { background-color: #f44336; color: white; padding: 8px 20px; }")
-        self.delete_btn.clicked.connect(self.delete_complaint)
-        button_layout.addWidget(self.delete_btn)
-        
-        details_layout.addLayout(button_layout)
         layout.addWidget(details_frame)
         
         self.selected_complaint_id = None
         self.selected_complaint_status = None
+        
+    def _add_bottom_buttons(self, layout): #BOTTOM BUTTONS LAYOUT
+        bottom_layout = QHBoxLayout()
+        
+        left_buttons_layout = QHBoxLayout()
+        
+        self.edit_btn = QPushButton("Edit")
+        self.edit_btn.setEnabled(False)
+        self.edit_btn.setMinimumWidth(180)
+        self.edit_btn.setMinimumHeight(45)
+        self.edit_btn.setFont(QFont("Arial", 11))
+        self.edit_btn.clicked.connect(self.edit_complaint)
+        left_buttons_layout.addWidget(self.edit_btn)
+        
+        self.delete_btn = QPushButton("Delete")
+        self.delete_btn.setEnabled(False)
+        self.delete_btn.setMinimumWidth(180)
+        self.delete_btn.setMinimumHeight(45)
+        self.delete_btn.setFont(QFont("Arial", 11))
+        self.delete_btn.setStyleSheet("QPushButton { background-color: #f44336; color: white; padding: 8px 20px; }")
+        self.delete_btn.clicked.connect(self.delete_complaint)
+        left_buttons_layout.addWidget(self.delete_btn)
+        
+        bottom_layout.addLayout(left_buttons_layout)
+        bottom_layout.addStretch()
+        
+        logout_btn = QPushButton("Logout")
+        logout_btn.setMinimumWidth(150)
+        logout_btn.setMinimumHeight(45)
+        logout_btn.setFont(QFont("Arial", 11))
+        logout_btn.setStyleSheet("QPushButton { background-color: #f44336; color: white; padding: 8px 20px; }")
+        logout_btn.clicked.connect(self.logout_requested.emit)
+        bottom_layout.addWidget(logout_btn)
+        
+        layout.addLayout(bottom_layout)
         
     def set_user(self, user_data): #SET CURRENT USER INFORMATION
         self.current_user = user_data
@@ -484,8 +507,6 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         #GET COMPLAINTS FROM DATABASE
         complaints = self.db.get_student_complaints(self.current_user['school_id'])
         
-        #Convert to tuple format expected by display_complaints
-        #(id, category, subject, location, status, date, description)
         formatted_complaints = [
             (
                 complaint['id'],
@@ -552,6 +573,6 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         elif complaint[4] == "In Progress":
             self.edit_btn.setEnabled(False)
             self.delete_btn.setEnabled(False)
-        else:  # Resolved
+        else:
             self.edit_btn.setEnabled(False)
             self.delete_btn.setEnabled(False)
