@@ -53,7 +53,7 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
         scroll.setWidget(scroll_widget)
         
         form_layout = QVBoxLayout(scroll_widget)
-        form_layout.setSpacing(12)
+        form_layout.setSpacing(10)
         form_layout.setContentsMargins(30, 20, 30, 20)
         
         self._add_title(form_layout)
@@ -82,6 +82,8 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
         layout.addSpacing(20)
         
     def _add_form_fields(self, layout): #REGISTRATION FORM FIELDS
+        layout.setSpacing(5)
+        
         layout.addWidget(QLabel("School ID: <span style='color: red;'>*</span>"))
         self.school_id_input = QLineEdit()
         self.school_id_input.setPlaceholderText("e.g., 560055") 
@@ -344,3 +346,4 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
         self.user_input.clear()
         self.pass_input.clear()
         self.user_input.setFocus()
+
