@@ -27,7 +27,7 @@ class SubmitComplaintDialog(QDialog): #DIALOG FOR SUBMITTING NEW COMPLAINT
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Submit New Complaint")
-        self.setFixedSize(500, 450)
+        self.setFixedSize(500, 400)
         self._setup_ui()
         
     def _setup_ui(self): #DIALOG UI
@@ -68,7 +68,8 @@ class SubmitComplaintDialog(QDialog): #DIALOG FOR SUBMITTING NEW COMPLAINT
         layout.addWidget(QLabel("Detailed Description: <span style='color: red;'>*</span>"))
         self.description_input = QTextEdit()
         self.description_input.setPlaceholderText("Provide detailed information about your complaint...")
-        self.description_input.setMinimumHeight(120)
+        self.description_input.setMinimumHeight(80)
+        self.description_input.setMaximumHeight(80)
         layout.addWidget(self.description_input)
         
         #BUTTONS
@@ -108,7 +109,7 @@ class EditComplaintDialog(QDialog): #CLASS FOR EDITING COMPLAINTS
     def __init__(self, complaint_data, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Edit Complaint")
-        self.setFixedSize(500, 450)
+        self.setFixedSize(500, 400)
         self.complaint_data = complaint_data
         self._setup_ui()
         self._populate_data()
@@ -148,7 +149,8 @@ class EditComplaintDialog(QDialog): #CLASS FOR EDITING COMPLAINTS
         #DESCRIPTION
         layout.addWidget(QLabel("Detailed Description: <span style='color: red;'>*</span>"))
         self.description_input = QTextEdit()
-        self.description_input.setMinimumHeight(120)
+        self.description_input.setMinimumHeight(80)
+        self.description_input.setMaximumHeight(80)
         layout.addWidget(self.description_input)
         
         #BUTTONS
@@ -204,7 +206,6 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         
     def _setup_window(self): #MAIN WINDOW PROPERTIES
         self.setWindowTitle("S.P.E.A.K - Student Dashboard")
-        self.showFullScreen()
         #self.setGeometry(100, 100, 1000, 650)
         
     def _setup_ui(self): #UI COMPONENT CONFIGURATION
@@ -577,4 +578,3 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         else:
             self.edit_btn.setEnabled(False)
             self.delete_btn.setEnabled(False)
-
