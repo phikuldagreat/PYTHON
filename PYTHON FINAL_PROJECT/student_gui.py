@@ -204,7 +204,8 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         
     def _setup_window(self): #MAIN WINDOW PROPERTIES
         self.setWindowTitle("S.P.E.A.K - Student Dashboard")
-        self.setGeometry(100, 100, 1000, 650)
+        self.showFullScreen()
+        #self.setGeometry(100, 100, 1000, 650)
         
     def _setup_ui(self): #UI COMPONENT CONFIGURATION
         central = QWidget()
@@ -576,3 +577,4 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         else:
             self.edit_btn.setEnabled(False)
             self.delete_btn.setEnabled(False)
+
