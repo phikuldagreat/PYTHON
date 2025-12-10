@@ -4,10 +4,13 @@
 #DATABASE CONFIGURATION / LOGIN INFO
 
 DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '',  #PERSONAL MYSQL PASSWORD
-    'database': 'speak_db'
+    'host': 'localhost',    #MYSQL server address
+    'user': 'root',         #MYSQL username
+    'password': '',         #MYSQL password
+    'database': 'speak_db'  #MYSQL database name
 }
+
+#RUN MYSQL SERVER BEFORE STARTING THE APPLICATION
+#RUN db_init.py TO CREATE THE TABLES
 
 

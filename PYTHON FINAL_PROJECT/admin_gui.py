@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QFont, QColor
+from theme import ColorTheme, StyleSheet
 
 
 class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINTS
@@ -24,7 +25,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         
     def _setup_window(self):
         self.setWindowTitle("S.P.E.A.K - Admin Dashboard")
-        #self.setGeometry(100, 100, 1200, 700)
+        self.setStyleSheet(StyleSheet.get_main_window_style())
         
     def _setup_ui(self):
         central = QWidget()
@@ -61,17 +62,37 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         
         layout.addLayout(header_layout)
         
-    def _add_filters(self, layout): #FILTER OPTIONS
-        filter_frame = QFrame()
-        filter_frame.setFrameStyle(QFrame.Shape.StyledPanel)
-        filter_frame.setStyleSheet("QFrame { background-color: #f5f5f5; border-radius: 5px; }")
-        
+    def _add_filters(self, layout): #ADD FILTER CONTROLS TO THE LAYOUT
+        filter_frame = self._create_filter_frame()
         filter_layout = QHBoxLayout(filter_frame)
         filter_layout.setContentsMargins(15, 15, 15, 15)
         
+        self._add_program_filter(filter_layout)
+        filter_layout.addSpacing(30)
+        self._add_status_filter(filter_layout)
+        filter_layout.addStretch()
+        self._add_refresh_button(filter_layout)
+        
+        layout.addWidget(filter_frame)
+
+    def _create_filter_frame(self): #CREATE + STYLE FILTER FRAME CONTAINER
+        filter_frame = QFrame()
+        filter_frame.setStyleSheet(f"""
+            QFrame {{
+                background-color: {ColorTheme.BG_PANEL};
+                border: 2px solid {ColorTheme.BORDER_LIGHT};
+                border-radius: 8px;
+            }}
+        """)
+        return filter_frame
+
+    def _add_program_filter(self, layout): #PROGRAM FILTER DROPDOWN
+        self.program_filter.setStyleSheet(StyleSheet.get_input_style())
+        self.status_filter.setStyleSheet(StyleSheet.get_input_style())
+        
         filter_program_label = QLabel("Filter by Program:")
         filter_program_label.setFont(QFont("Arial", 12))
-        filter_layout.addWidget(filter_program_label)
+        layout.addWidget(filter_program_label)
         
         self.program_filter = QComboBox()
         self.program_filter.addItems([
@@ -88,13 +109,15 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         self.program_filter.setMinimumWidth(400)
         self.program_filter.setMinimumHeight(40)
         self.program_filter.setFont(QFont("Arial", 11))
-        filter_layout.addWidget(self.program_filter)
-        
-        filter_layout.addSpacing(30)
+        layout.addWidget(self.program_filter)
+
+    def _add_status_filter(self, layout): #STATUS FILTER DROPDOWN
+        self.program_filter.setStyleSheet(StyleSheet.get_input_style())
+        self.status_filter.setStyleSheet(StyleSheet.get_input_style())
         
         filter_status_label = QLabel("Filter by Status:")
         filter_status_label.setFont(QFont("Arial", 12))
-        filter_layout.addWidget(filter_status_label)
+        layout.addWidget(filter_status_label)
         
         self.status_filter = QComboBox()
         self.status_filter.addItems([
@@ -107,20 +130,21 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         self.status_filter.setMinimumWidth(200)
         self.status_filter.setMinimumHeight(40)
         self.status_filter.setFont(QFont("Arial", 11))
-        filter_layout.addWidget(self.status_filter)
-        
-        filter_layout.addStretch()
+        layout.addWidget(self.status_filter)
+
+    def _add_refresh_button(self, layout): #REFRESH BUTTON
+        refresh_btn.setStyleSheet(StyleSheet.get_button_style("primary"))
         
         refresh_btn = QPushButton("Refresh")
         refresh_btn.setMinimumWidth(150)
         refresh_btn.setMinimumHeight(40)
         refresh_btn.setFont(QFont("Arial", 11))
         refresh_btn.clicked.connect(self.load_complaints)
-        filter_layout.addWidget(refresh_btn)
-        
-        layout.addWidget(filter_frame)
+        layout.addWidget(refresh_btn)
         
     def _add_complaints_table(self, layout): #COMPLAINTS TABLE
+        self.complaints_table.setStyleSheet(StyleSheet.get_table_style())
+        
         table_label = QLabel("Complaints List")
         label_font = QFont()
         label_font.setPointSize(12)
@@ -149,7 +173,24 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         
         layout.addWidget(self.complaints_table)
         
-    def _add_details_panel(self, layout): #COMPLAINT DETAILS PANEL (without buttons)
+    def _add_details_panel(self, layout): #COMPLAINT DETAILS PANEL
+        
+        details_frame.setStyleSheet(f"""
+    QFrame {{
+        background-color: {ColorTheme.BG_CARD};
+        border: 2px solid {ColorTheme.BORDER_LIGHT};
+        border-radius: 8px;
+        }}
+    """)
+
+        self.details_text.setStyleSheet(f"""
+    QTextEdit {{
+        background-color: {ColorTheme.WHITE};
+        border: none;
+        color: {ColorTheme.TEXT_PRIMARY};
+        }}
+    """)
+
         details_label = QLabel("Complaint Details")
         label_font = QFont()
         label_font.setPointSize(12)
@@ -176,6 +217,10 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         self.selected_complaint_id = None
         
     def _add_bottom_buttons(self, layout): #BOTTOM BUTTONS LAYOUT
+        self.in_progress_btn.setStyleSheet(StyleSheet.get_button_style("secondary"))
+        self.resolve_btn.setStyleSheet(StyleSheet.get_button_style("success"))
+        logout_btn.setStyleSheet(StyleSheet.get_button_style("danger"))
+
         bottom_layout = QHBoxLayout()
         
         left_buttons_layout = QHBoxLayout()
@@ -215,15 +260,12 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         self.admin_label.setText(f"Admin: {admin_name}")
         
     def load_complaints(self):
-        print("load_complaints called")
         from database import Database
         from config import DB_CONFIG
         
         print(f"DB_CONFIG: {DB_CONFIG}")
         db = Database(**DB_CONFIG)
-        print(f"Database object created")
         if db.connect():
-            print("Connected to database")
             complaints_data = db.get_all_complaints()
             print(f"Got {len(complaints_data)} complaints")
             db.close()
@@ -254,13 +296,13 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
                 item = QTableWidgetItem(str(data))
                     
                 #STATUS COLOR CODES
-                if col == 4:  
-                    if data == "Pending":
-                        item.setForeground(QColor("#ff9800"))
-                    elif data == "In Progress":
-                        item.setForeground(QColor("#2196F3"))
-                    elif data == "Resolved":
-                        item.setForeground(QColor("#4CAF50"))
+            if col == 4:  # STATUS COLUMN
+                if data == "Pending":
+                    item.setForeground(QColor(ColorTheme.STATUS_PENDING))
+                elif data == "In Progress":
+                    item.setForeground(QColor(ColorTheme.STATUS_IN_PROGRESS))
+                elif data == "Resolved":
+                    item.setForeground(QColor(ColorTheme.STATUS_RESOLVED))
                     
                 self.complaints_table.setItem(row, col, item)
         

@@ -31,7 +31,7 @@ class Database:
             
             if self.connection.is_connected():
                 self.cursor = self.connection.cursor(dictionary=True)
-                print(f"✓ Connected to MySQL database: {self.database}")
+                print(f"Connected to MySQL database: {self.database}")
                 return True
                 
         except Error as e:
@@ -43,7 +43,7 @@ class Database:
             if self.cursor:
                 self.cursor.close()
             self.connection.close()
-            print("✓ MySQL connection closed")
+            print("MySQL connection closed")
     
     def create_database(self): #CREATE DATABASE IF IT DOESN'T EXIST
         try:
@@ -58,7 +58,7 @@ class Database:
             
             #CREATE DATABASE
             temp_cursor.execute(f"CREATE DATABASE IF NOT EXISTS {self.database}")
-            print(f"✓ Database '{self.database}' created/verified")
+            print(f"Database '{self.database}' created/verified")
             
             temp_cursor.close()
             temp_connection.close()
@@ -68,60 +68,13 @@ class Database:
             print(f"Error creating database: {e}")
             return False
     
-    def create_tables(self): #CREATE TABLES IF THEY DON'T EXIST YET
+    def create_tables(self): #CREATES NECESSARY TABLES IF THEY DON'T EXIST
         try:
             self._ensure_connection()
-            #STUDENTS TABLE
-            self.cursor.execute('''
-                CREATE TABLE IF NOT EXISTS students (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    school_id VARCHAR(50) UNIQUE NOT NULL,
-                    email VARCHAR(100) UNIQUE NOT NULL,
-                    first_name VARCHAR(100) NOT NULL,
-                    middle_initial VARCHAR(5),
-                    last_name VARCHAR(100) NOT NULL,
-                    contact_number VARCHAR(20) NOT NULL,
-                    program VARCHAR(200) NOT NULL,
-                    year_level VARCHAR(20) NOT NULL,
-                    password_hash VARCHAR(64) NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    last_login TIMESTAMP NULL,
-                    INDEX idx_school_id (school_id),
-                    INDEX idx_email (email)
-                )
-            ''')
             
-            #LOGIN HISTORY TABLE
-            self.cursor.execute('''
-                CREATE TABLE IF NOT EXISTS login_history (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    student_id INT NOT NULL,
-                    login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    ip_address VARCHAR(45),
-                    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
-                )
-            ''')
-            
-            #COMPLAINTS TABLE
-            self.cursor.execute('''
-                CREATE TABLE IF NOT EXISTS complaints (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    student_id INT NOT NULL,
-                    school_id VARCHAR(50) NOT NULL,
-                    program VARCHAR(200) NOT NULL,
-                    category VARCHAR(100) NOT NULL,
-                    subject VARCHAR(255) NOT NULL,
-                    location VARCHAR(255) NOT NULL,
-                    description TEXT NOT NULL,
-                    status ENUM('Pending', 'In Progress', 'Resolved') DEFAULT 'Pending',
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-                    INDEX idx_student_id (student_id),
-                    INDEX idx_status (status),
-                    INDEX idx_created_at (created_at)
-                )
-            ''')
+            self._create_students_table()
+            self._create_login_history_table()
+            self._create_complaints_table()
             
             self.connection.commit()
             print("✓ Database tables created successfully")
@@ -130,55 +83,83 @@ class Database:
         except Error as e:
             print(f"Error creating tables: {e}")
             return False
+
+    def _create_students_table(self): #CREATES STUDENTS TABLE
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS students (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                school_id VARCHAR(50) UNIQUE NOT NULL,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                first_name VARCHAR(100) NOT NULL,
+                middle_initial VARCHAR(5),
+                last_name VARCHAR(100) NOT NULL,
+                contact_number VARCHAR(20) NOT NULL,
+                program VARCHAR(200) NOT NULL,
+                year_level VARCHAR(20) NOT NULL,
+                password_hash VARCHAR(64) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_login TIMESTAMP NULL,
+                INDEX idx_school_id (school_id),
+                INDEX idx_email (email)
+            )
+        ''')
+
+    def _create_login_history_table(self): #LOGIN HISTORY TABLE
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS login_history (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                student_id INT NOT NULL,
+                login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                ip_address VARCHAR(45),
+                FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+            )
+        ''')
+
+    def _create_complaints_table(self): #CREATES COMPLAINTS TABLE
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS complaints (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                student_id INT NOT NULL,
+                school_id VARCHAR(50) NOT NULL,
+                program VARCHAR(200) NOT NULL,
+                category VARCHAR(100) NOT NULL,
+                subject VARCHAR(255) NOT NULL,
+                location VARCHAR(255) NOT NULL,
+                description TEXT NOT NULL,
+                status ENUM('Pending', 'In Progress', 'Resolved') DEFAULT 'Pending',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+                INDEX idx_student_id (student_id),
+                INDEX idx_status (status),
+                INDEX idx_created_at (created_at)
+            )
+        ''')
     
     @staticmethod
     def hash_password(password): #PASSWORD HASHING FOR PRIVACY AND SECURITY
         return hashlib.sha256(password.encode()).hexdigest()
     
-    def register_student(self, student_data): #REGISTER NEW STUDENT
+    def register_student(self, student_data):
+        """
+        REGISTERS NEW STUDENT IN THE DATABASE
+        
+        ARGS:
+            student_data (dict): DICTIONARY CONTAINING STUDENT INFO
+            
+        RETURNS:
+            tuple: (success: bool, message: str, student_id: int or None)
+        """
         try:
             self._ensure_connection()
-            #CHECKS FOR DUPLICATE SCHOOL IDS
-            self.cursor.execute(
-                "SELECT id FROM students WHERE school_id = %s",
-                (student_data['school_id'],)
-            )
-            if self.cursor.fetchone():
-                return False, "School ID already registered.", None
             
-            #CHECKS FOR DUPLICATE EMAILS
-            self.cursor.execute(
-                "SELECT id FROM students WHERE email = %s",
-                (student_data['email'],)
-            )
-            if self.cursor.fetchone():
-                return False, "Email already registered.", None
+            # Check for duplicates
+            duplicate_check = self._check_duplicate_student(student_data)
+            if duplicate_check:
+                return duplicate_check
             
-            #HASH PASSWORD(S)
-            password_hash = self.hash_password(student_data['password'])
-            
-            #INSERT NEW STUDENT
-            query = '''
-                INSERT INTO students (
-                    school_id, email, first_name, middle_initial, last_name,
-                    contact_number, program, year_level, password_hash
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-            '''
-            values = (
-                student_data['school_id'],
-                student_data['email'],
-                student_data['first_name'],
-                student_data['middle_initial'],
-                student_data['last_name'],
-                student_data['contact_number'],
-                student_data['program'],
-                student_data['year_level'],
-                password_hash
-            )
-            
-            self.cursor.execute(query, values)
-            self.connection.commit()
-            student_id = self.cursor.lastrowid
+            # Insert new student
+            student_id = self._insert_student_record(student_data)
             
             return True, "Registration successful!", student_id
             
@@ -186,6 +167,66 @@ class Database:
             print(f"Database error: {e}")
             self.connection.rollback()
             return False, "Database error occurred. Please try again.", None
+
+    def _check_duplicate_student(self, student_data):
+        """
+        CHECKS IF SCHOOL ID OR EMAIL ALREADY EXISTS IN THE DATABASE
+        
+        RETURNS:
+            tuple OR None: (success: bool, message: str) IF DUPLICATE FOUND, ELSE NONE
+        """
+        # Check for duplicate school ID
+        self.cursor.execute(
+            "SELECT id FROM students WHERE school_id = %s",
+            (student_data['school_id'],)
+        )
+        if self.cursor.fetchone():
+            return False, "School ID already registered.", None
+        
+        # Check for duplicate email
+        self.cursor.execute(
+            "SELECT id FROM students WHERE email = %s",
+            (student_data['email'],)
+        )
+        if self.cursor.fetchone():
+            return False, "Email already registered.", None
+        
+        return None
+
+    def _insert_student_record(self, student_data):
+        """
+        #INSERTS NEW STUDENT RECORD INTO THE DATABASE
+        
+        ARGS:
+            student_data (dict): DICTIONARY CONTAINING STUDENT INFO
+            
+        RETURNS:
+            int: NEWLY CREATED STUDENT ID
+        """
+        password_hash = self.hash_password(student_data['password'])
+        
+        query = '''
+            INSERT INTO students (
+                school_id, email, first_name, middle_initial, last_name,
+                contact_number, program, year_level, password_hash
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        '''
+        values = (
+            student_data['school_id'],
+            student_data['email'],
+            student_data['first_name'],
+            student_data['middle_initial'],
+            student_data['last_name'],
+            student_data['contact_number'],
+            student_data['program'],
+            student_data['year_level'],
+            password_hash
+        )
+        
+        self.cursor.execute(query, values)
+        self.connection.commit()
+        
+        return self.cursor.lastrowid
     
     def authenticate_student(self, school_id, password): #CHECKS IF STUDENT ACC. DETAILS EXIST
         try:

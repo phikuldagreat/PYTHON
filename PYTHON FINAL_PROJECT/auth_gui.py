@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QFont
+from theme import ColorTheme, StyleSheet
 
 
 class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
@@ -37,6 +38,7 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
     def _setup_window(self):
         self.setWindowTitle("S.P.E.A.K - Student Registration")
         self.setFixedSize(450, 650)
+        self.setStyleSheet(StyleSheet.get_main_window_style())
         
     def _setup_ui(self):
         central = QWidget()
@@ -81,21 +83,36 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
         
         layout.addSpacing(20)
         
-    def _add_form_fields(self, layout): #REGISTRATION FORM FIELDS
+    def _add_form_fields(self, layout): #ADD ALL REGISTRATION FORM FIELDS TO THE LAYOUT
         layout.setSpacing(5)
         
+        self._add_school_id_field(layout)
+        self._add_email_field(layout)
+        self._add_name_fields(layout)
+        self._add_contact_field(layout)
+        self._add_program_year_fields(layout)
+        self._add_password_fields(layout)
+        
+        layout.addSpacing(10)
+
+    def _add_school_id_field(self, layout): #SCHOOL AND ID INPUT FIELD
+        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(QLabel("School ID: <span style='color: red;'>*</span>"))
         self.school_id_input = QLineEdit()
-        self.school_id_input.setPlaceholderText("e.g., 560055") 
+        self.school_id_input.setPlaceholderText("e.g., 560055")
         self.school_id_input.setMinimumHeight(35)
         layout.addWidget(self.school_id_input)
-        
+
+    def _add_email_field(self, layout): #EMAIL INPUT FIELD
+        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(QLabel("School Email: <span style='color: red;'>*</span>"))
         self.email_input = QLineEdit()
         self.email_input.setPlaceholderText("name.schoolid@umindanao.edu.ph")
         self.email_input.setMinimumHeight(35)
         layout.addWidget(self.email_input)
-        
+
+    def _add_name_fields(self, layout): #NAME INPUT FIELDS
+        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(QLabel("First Name: <span style='color: red;'>*</span>"))
         self.fname_input = QLineEdit()
         self.fname_input.setPlaceholderText("Enter first name")
@@ -114,13 +131,17 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
         self.lname_input.setPlaceholderText("Enter last name")
         self.lname_input.setMinimumHeight(35)
         layout.addWidget(self.lname_input)
-        
+
+    def _add_contact_field(self, layout): #CONTACT NUMBER INPUT FIELD
+        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(QLabel("Contact Number: <span style='color: red;'>*</span>"))
         self.contact_input = QLineEdit()
         self.contact_input.setPlaceholderText("09XX-XXX-XXXX")
         self.contact_input.setMinimumHeight(35)
         layout.addWidget(self.contact_input)
-        
+
+    def _add_program_year_fields(self, layout): #PROGRAM AND YR LEVEL DROPDOWN FIELDS
+        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(QLabel("Program: <span style='color: red;'>*</span>"))
         self.program_combo = QComboBox()
         self.program_combo.addItems(self.PROGRAMS)
@@ -132,7 +153,9 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
         self.year_combo.addItems(self.YEAR_LEVELS)
         self.year_combo.setMinimumHeight(35)
         layout.addWidget(self.year_combo)
-        
+
+    def _add_password_fields(self, layout): #PASSWORD AND CONFIRM PASSWORD INPUT FIELDS
+        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(QLabel("Password: <span style='color: red;'>*</span>"))
         self.password_input = QLineEdit()
         self.password_input.setPlaceholderText("Create a password")
@@ -147,9 +170,8 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
         self.confirm_password_input.setMinimumHeight(35)
         layout.addWidget(self.confirm_password_input)
         
-        layout.addSpacing(10)
-        
     def _add_buttons(self, layout): #REGISTER AND BACK BUTTONS
+        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
         self.register_btn = QPushButton("Register")
         self.register_btn.setMinimumHeight(45)
         self.register_btn.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -254,6 +276,7 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
     def _setup_window(self):
         self.setWindowTitle("S.P.E.A.K - For the people.")
         self.setFixedSize(400, 450)
+        self.setStyleSheet(StyleSheet.get_main_window_style())
         
     def _setup_ui(self):
         central = QWidget()
@@ -284,6 +307,9 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
         layout.addSpacing(20)
         
     def _add_input_fields(self, layout):
+        self.user_input.setStyleSheet(StyleSheet.get_input_style())
+        self.pass_input.setStyleSheet(StyleSheet.get_input_style())
+
         self.user_label = QLabel("School ID:")
         layout.addWidget(self.user_label)
         
@@ -305,6 +331,22 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
         layout.addSpacing(10)
         
     def _add_buttons(self, layout):
+        self.login_btn.setStyleSheet(StyleSheet.get_button_style("primary"))
+
+        self.register_btn.setStyleSheet(f"""
+        QPushButton {{
+        color: {ColorTheme.GOLDEN_AMBER};
+        text-decoration: underline;
+        background: transparent;
+        border: none;
+        font-weight: bold;
+        }}
+        
+        QPushButton:hover {{
+        color: {ColorTheme.BTN_PRIMARY_HOVER};
+        }}
+        """)
+        
         self.login_btn = QPushButton("Login")
         self.login_btn.setMinimumHeight(40)
         self.login_btn.setCursor(Qt.CursorShape.PointingHandCursor)
