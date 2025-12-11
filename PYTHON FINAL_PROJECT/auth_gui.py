@@ -95,28 +95,28 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
         
         layout.addSpacing(10)
 
-    def _add_school_id_field(self, layout): #SCHOOL AND ID INPUT FIELD
-        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
+    def _add_school_id_field(self, layout): #SCHOOL ID INPUT FIELD
         layout.addWidget(QLabel("School ID: <span style='color: red;'>*</span>"))
         self.school_id_input = QLineEdit()
         self.school_id_input.setPlaceholderText("e.g., 560055")
         self.school_id_input.setMinimumHeight(35)
+        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.school_id_input)
 
     def _add_email_field(self, layout): #EMAIL INPUT FIELD
-        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(QLabel("School Email: <span style='color: red;'>*</span>"))
-        self.email_input = QLineEdit()
+        self.email_input = QLineEdit()  # CREATE FIRST
         self.email_input.setPlaceholderText("name.schoolid@umindanao.edu.ph")
         self.email_input.setMinimumHeight(35)
+        self.email_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.email_input)
 
     def _add_name_fields(self, layout): #NAME INPUT FIELDS
-        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(QLabel("First Name: <span style='color: red;'>*</span>"))
         self.fname_input = QLineEdit()
         self.fname_input.setPlaceholderText("Enter first name")
         self.fname_input.setMinimumHeight(35)
+        self.fname_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.fname_input)
         
         layout.addWidget(QLabel("Middle Initial:"))
@@ -124,43 +124,46 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
         self.mi_input.setPlaceholderText("M.I. (optional)")
         self.mi_input.setMinimumHeight(35)
         self.mi_input.setMaxLength(35)
+        self.mi_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.mi_input)
         
         layout.addWidget(QLabel("Last Name: <span style='color: red;'>*</span>"))
         self.lname_input = QLineEdit()
         self.lname_input.setPlaceholderText("Enter last name")
         self.lname_input.setMinimumHeight(35)
+        self.lname_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.lname_input)
 
     def _add_contact_field(self, layout): #CONTACT NUMBER INPUT FIELD
-        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(QLabel("Contact Number: <span style='color: red;'>*</span>"))
         self.contact_input = QLineEdit()
         self.contact_input.setPlaceholderText("09XX-XXX-XXXX")
         self.contact_input.setMinimumHeight(35)
+        self.contact_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.contact_input)
 
     def _add_program_year_fields(self, layout): #PROGRAM AND YR LEVEL DROPDOWN FIELDS
-        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(QLabel("Program: <span style='color: red;'>*</span>"))
         self.program_combo = QComboBox()
         self.program_combo.addItems(self.PROGRAMS)
         self.program_combo.setMinimumHeight(35)
+        self.program_combo.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.program_combo)
         
         layout.addWidget(QLabel("Year Level: <span style='color: red;'>*</span>"))
         self.year_combo = QComboBox()
         self.year_combo.addItems(self.YEAR_LEVELS)
         self.year_combo.setMinimumHeight(35)
+        self.year_combo.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.year_combo)
 
     def _add_password_fields(self, layout): #PASSWORD AND CONFIRM PASSWORD INPUT FIELDS
-        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(QLabel("Password: <span style='color: red;'>*</span>"))
         self.password_input = QLineEdit()
         self.password_input.setPlaceholderText("Create a password")
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
         self.password_input.setMinimumHeight(35)
+        self.password_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.password_input)
         
         layout.addWidget(QLabel("Confirm Password: <span style='color: red;'>*</span>"))
@@ -168,14 +171,15 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
         self.confirm_password_input.setPlaceholderText("Re-enter password")
         self.confirm_password_input.setEchoMode(QLineEdit.EchoMode.Password)
         self.confirm_password_input.setMinimumHeight(35)
+        self.confirm_password_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.confirm_password_input)
         
     def _add_buttons(self, layout): #REGISTER AND BACK BUTTONS
-        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
         self.register_btn = QPushButton("Register")
         self.register_btn.setMinimumHeight(45)
         self.register_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.register_btn.clicked.connect(self._on_register_clicked)
+        self.register_btn.setStyleSheet(StyleSheet.get_button_style("primary"))
         layout.addWidget(self.register_btn)
         
         layout.addSpacing(10)
@@ -189,8 +193,19 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
         self.back_btn = QPushButton("Back to Login")
         self.back_btn.setFlat(True)
         self.back_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.back_btn.setStyleSheet("QPushButton { color: #0066cc; text-decoration: underline; }")
         self.back_btn.clicked.connect(self._on_back_clicked)
+        self.back_btn.setStyleSheet(f"""
+            QPushButton {{
+                color: {ColorTheme.GOLDEN_AMBER};
+                text-decoration: underline;
+                background: transparent;
+                border: none;
+                font-weight: bold;
+            }}
+            QPushButton:hover {{
+                color: {ColorTheme.BTN_PRIMARY_HOVER};
+            }}
+        """)
         back_layout.addWidget(self.back_btn)
         
         layout.addLayout(back_layout)
@@ -307,15 +322,13 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
         layout.addSpacing(20)
         
     def _add_input_fields(self, layout):
-        self.user_input.setStyleSheet(StyleSheet.get_input_style())
-        self.pass_input.setStyleSheet(StyleSheet.get_input_style())
-
         self.user_label = QLabel("School ID:")
         layout.addWidget(self.user_label)
         
         self.user_input = QLineEdit()
         self.user_input.setPlaceholderText("Enter School ID...")
         self.user_input.setMinimumHeight(35)
+        self.user_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.user_input)
         
         self.pass_label = QLabel("Password:")
@@ -326,31 +339,17 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
         self.pass_input.setEchoMode(QLineEdit.EchoMode.Password)
         self.pass_input.setMinimumHeight(35)
         self.pass_input.returnPressed.connect(self._on_login_clicked)
+        self.pass_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.pass_input)
         
         layout.addSpacing(10)
         
     def _add_buttons(self, layout):
-        self.login_btn.setStyleSheet(StyleSheet.get_button_style("primary"))
-
-        self.register_btn.setStyleSheet(f"""
-        QPushButton {{
-        color: {ColorTheme.GOLDEN_AMBER};
-        text-decoration: underline;
-        background: transparent;
-        border: none;
-        font-weight: bold;
-        }}
-        
-        QPushButton:hover {{
-        color: {ColorTheme.BTN_PRIMARY_HOVER};
-        }}
-        """)
-        
         self.login_btn = QPushButton("Login")
         self.login_btn.setMinimumHeight(40)
         self.login_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.login_btn.clicked.connect(self._on_login_clicked)
+        self.login_btn.setStyleSheet(StyleSheet.get_button_style("primary"))
         layout.addWidget(self.login_btn)
         
         layout.addSpacing(10)
@@ -364,8 +363,19 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
         self.register_btn = QPushButton("Register")
         self.register_btn.setFlat(True)
         self.register_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.register_btn.setStyleSheet("QPushButton { color: #0066cc; text-decoration: underline; }")
         self.register_btn.clicked.connect(self._on_register_clicked)
+        self.register_btn.setStyleSheet(f"""
+            QPushButton {{
+                color: {ColorTheme.GOLDEN_AMBER};
+                text-decoration: underline;
+                background: transparent;
+                border: none;
+                font-weight: bold;
+            }}
+            QPushButton:hover {{
+                color: {ColorTheme.BTN_PRIMARY_HOVER};
+            }}
+        """)  # THEN STYLE
         register_layout.addWidget(self.register_btn)
         
         layout.addLayout(register_layout)

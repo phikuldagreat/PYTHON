@@ -87,9 +87,6 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         return filter_frame
 
     def _add_program_filter(self, layout): #PROGRAM FILTER DROPDOWN
-        self.program_filter.setStyleSheet(StyleSheet.get_input_style())
-        self.status_filter.setStyleSheet(StyleSheet.get_input_style())
-        
         filter_program_label = QLabel("Filter by Program:")
         filter_program_label.setFont(QFont("Arial", 12))
         layout.addWidget(filter_program_label)
@@ -109,12 +106,10 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         self.program_filter.setMinimumWidth(400)
         self.program_filter.setMinimumHeight(40)
         self.program_filter.setFont(QFont("Arial", 11))
+        self.program_filter.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.program_filter)
 
     def _add_status_filter(self, layout): #STATUS FILTER DROPDOWN
-        self.program_filter.setStyleSheet(StyleSheet.get_input_style())
-        self.status_filter.setStyleSheet(StyleSheet.get_input_style())
-        
         filter_status_label = QLabel("Filter by Status:")
         filter_status_label.setFont(QFont("Arial", 12))
         layout.addWidget(filter_status_label)
@@ -130,21 +125,19 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         self.status_filter.setMinimumWidth(200)
         self.status_filter.setMinimumHeight(40)
         self.status_filter.setFont(QFont("Arial", 11))
+        self.status_filter.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.status_filter)
-
+    
     def _add_refresh_button(self, layout): #REFRESH BUTTON
-        refresh_btn.setStyleSheet(StyleSheet.get_button_style("primary"))
-        
         refresh_btn = QPushButton("Refresh")
         refresh_btn.setMinimumWidth(150)
         refresh_btn.setMinimumHeight(40)
         refresh_btn.setFont(QFont("Arial", 11))
         refresh_btn.clicked.connect(self.load_complaints)
+        refresh_btn.setStyleSheet(StyleSheet.get_button_style("primary"))
         layout.addWidget(refresh_btn)
         
     def _add_complaints_table(self, layout): #COMPLAINTS TABLE
-        self.complaints_table.setStyleSheet(StyleSheet.get_table_style())
-        
         table_label = QLabel("Complaints List")
         label_font = QFont()
         label_font.setPointSize(12)
@@ -170,27 +163,11 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         self.complaints_table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.complaints_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.complaints_table.itemSelectionChanged.connect(self.on_complaint_selected)
+        self.complaints_table.setStyleSheet(StyleSheet.get_table_style())
         
         layout.addWidget(self.complaints_table)
         
     def _add_details_panel(self, layout): #COMPLAINT DETAILS PANEL
-        
-        details_frame.setStyleSheet(f"""
-    QFrame {{
-        background-color: {ColorTheme.BG_CARD};
-        border: 2px solid {ColorTheme.BORDER_LIGHT};
-        border-radius: 8px;
-        }}
-    """)
-
-        self.details_text.setStyleSheet(f"""
-    QTextEdit {{
-        background-color: {ColorTheme.WHITE};
-        border: none;
-        color: {ColorTheme.TEXT_PRIMARY};
-        }}
-    """)
-
         details_label = QLabel("Complaint Details")
         label_font = QFont()
         label_font.setPointSize(12)
@@ -200,8 +177,14 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         
         details_frame = QFrame()
         details_frame.setFrameStyle(QFrame.Shape.StyledPanel)
-        details_frame.setStyleSheet("QFrame { background-color: #f9f9f9; border-radius: 5px; }")
         details_frame.setMaximumHeight(150)
+        details_frame.setStyleSheet(f"""
+            QFrame {{
+                background-color: {ColorTheme.BG_CARD};
+                border: 2px solid {ColorTheme.BORDER_LIGHT};
+                border-radius: 8px;
+            }}
+        """)  # THEN STYLE
         
         details_layout = QVBoxLayout(details_frame)
         details_layout.setContentsMargins(15, 15, 15, 15)
@@ -210,6 +193,13 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         self.details_text.setReadOnly(True)
         self.details_text.setPlaceholderText("Select a complaint to view details...")
         self.details_text.setMaximumHeight(120)
+        self.details_text.setStyleSheet(f"""
+            QTextEdit {{
+                background-color: {ColorTheme.WHITE};
+                border: none;
+                color: {ColorTheme.TEXT_PRIMARY};
+            }}
+        """)
         details_layout.addWidget(self.details_text)
         
         layout.addWidget(details_frame)
@@ -217,40 +207,37 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         self.selected_complaint_id = None
         
     def _add_bottom_buttons(self, layout): #BOTTOM BUTTONS LAYOUT
-        self.in_progress_btn.setStyleSheet(StyleSheet.get_button_style("secondary"))
-        self.resolve_btn.setStyleSheet(StyleSheet.get_button_style("success"))
-        logout_btn.setStyleSheet(StyleSheet.get_button_style("danger"))
-
         bottom_layout = QHBoxLayout()
         
         left_buttons_layout = QHBoxLayout()
         
-        self.in_progress_btn = QPushButton("Mark as In Progress")
+        self.in_progress_btn = QPushButton("Mark as In Progress")  # CREATE FIRST
         self.in_progress_btn.setEnabled(False)
         self.in_progress_btn.setMinimumWidth(180)
         self.in_progress_btn.setMinimumHeight(45)
         self.in_progress_btn.setFont(QFont("Arial", 11))
         self.in_progress_btn.clicked.connect(lambda: self.update_status("In Progress"))
+        self.in_progress_btn.setStyleSheet(StyleSheet.get_button_style("secondary"))  # THEN STYLE
         left_buttons_layout.addWidget(self.in_progress_btn)
         
-        self.resolve_btn = QPushButton("Mark as Resolved")
+        self.resolve_btn = QPushButton("Mark as Resolved")  # CREATE FIRST
         self.resolve_btn.setEnabled(False)
         self.resolve_btn.setMinimumWidth(180)
         self.resolve_btn.setMinimumHeight(45)
         self.resolve_btn.setFont(QFont("Arial", 11))
-        self.resolve_btn.setStyleSheet("QPushButton { background-color: #4CAF50; color: white; padding: 8px 20px; }")
         self.resolve_btn.clicked.connect(lambda: self.update_status("Resolved"))
+        self.resolve_btn.setStyleSheet(StyleSheet.get_button_style("success"))  # THEN STYLE
         left_buttons_layout.addWidget(self.resolve_btn)
         
         bottom_layout.addLayout(left_buttons_layout)
         bottom_layout.addStretch()
         
-        logout_btn = QPushButton("Logout")
+        logout_btn = QPushButton("Logout")  # CREATE FIRST
         logout_btn.setMinimumWidth(150)
         logout_btn.setMinimumHeight(45)
         logout_btn.setFont(QFont("Arial", 11))
-        logout_btn.setStyleSheet("QPushButton { background-color: #f44336; color: white; padding: 8px 20px; }")
         logout_btn.clicked.connect(self.logout_requested.emit)
+        logout_btn.setStyleSheet(StyleSheet.get_button_style("danger"))  # THEN STYLE
         bottom_layout.addWidget(logout_btn)
         
         layout.addLayout(bottom_layout)
