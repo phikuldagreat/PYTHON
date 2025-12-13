@@ -399,3 +399,4 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
         self.pass_input.clear()
         self.user_input.setFocus()
 
+
