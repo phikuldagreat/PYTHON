@@ -4,7 +4,7 @@
 #MAIN APPLICATION FILE
 
 from PyQt6.QtWidgets import QApplication
-from auth_gui import LoginWindow, RegisterWindow
+from auth_gui import LoginWindow, RegisterWindow, ForgotPasswordDialog
 from admin_gui import AdminDashboard
 from student_gui import StudentDashboard
 from auth_logic import AuthService
@@ -27,6 +27,7 @@ class AuthController:
         self.login_window.login_clicked.connect(self.handle_login)
         self.login_window.register_requested.connect(self.show_register_window)
         self.login_window.admin_login_requested.connect(self.handle_admin_login)
+        self.login_window.forgot_password_requested.connect(self.handle_forgot_password)
         
         #REGISTER WINDOW SIGNALS
         self.register_window.registration_complete.connect(self.handle_registration)
@@ -85,6 +86,18 @@ class AuthController:
             import traceback
             traceback.print_exc()
             self.register_window.show_error("Error", f"An error occurred: {str(e)}")
+    
+    def handle_forgot_password(self): #HANDLE PASSWORD RESET
+        dialog = ForgotPasswordDialog(self.login_window)
+        
+        if dialog.exec():
+            reset_data = dialog.get_reset_data()
+            success, message = self.auth_service.reset_password(reset_data)
+            
+            if success:
+                self.login_window.show_success("Password Reset", message)
+            else:
+                self.login_window.show_error("Reset Failed", message)
     
     def show_register_window(self): #SHOWS REGISTRATION WINDOW
         self.login_window.hide()

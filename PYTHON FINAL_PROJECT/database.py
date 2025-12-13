@@ -88,14 +88,14 @@ class Database:
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS students (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                school_id VARCHAR(50) UNIQUE NOT NULL,
-                email VARCHAR(100) UNIQUE NOT NULL,
-                first_name VARCHAR(100) NOT NULL,
-                middle_initial VARCHAR(5),
-                last_name VARCHAR(100) NOT NULL,
-                contact_number VARCHAR(20) NOT NULL,
-                program VARCHAR(200) NOT NULL,
-                year_level VARCHAR(20) NOT NULL,
+                school_id VARCHAR(6) UNIQUE NOT NULL,
+                email VARCHAR(50) UNIQUE NOT NULL,
+                first_name VARCHAR(50) NOT NULL,
+                middle_initial VARCHAR(50),
+                last_name VARCHAR(50) NOT NULL,
+                contact_number VARCHAR(15) NOT NULL,
+                program VARCHAR(100) NOT NULL,
+                year_level VARCHAR(10) NOT NULL,
                 password_hash VARCHAR(64) NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 last_login TIMESTAMP NULL,
@@ -115,13 +115,11 @@ class Database:
             )
         ''')
 
-    def _create_complaints_table(self): #CREATES COMPLAINTS TABLE
+    def _create_complaints_table(self): #CREATES COMPLAINTS TABLE - NORMALIZED VERSION
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS complaints (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 student_id INT NOT NULL,
-                school_id VARCHAR(50) NOT NULL,
-                program VARCHAR(200) NOT NULL,
                 category VARCHAR(100) NOT NULL,
                 subject VARCHAR(255) NOT NULL,
                 location VARCHAR(255) NOT NULL,
@@ -344,21 +342,28 @@ class Database:
             return False, "Error changing password."
 
     def submit_complaint(self, complaint_data):
+        """
+        SUBMIT NEW COMPLAINT - NORMALIZED VERSION WITHOUT REDUNDANT DATA
+        """
         try:
             self._ensure_connection()
+            #GET STUDENT_ID FROM SCHOOL_ID
+            self.cursor.execute(
+                "SELECT id FROM students WHERE school_id = %s",
+                (complaint_data['school_id'],)
+            )
+            student = self.cursor.fetchone()
+            
+            if not student:
+                return False, "Student not found.", None
+            
             query = '''
                 INSERT INTO complaints (
-                    student_id, school_id, program, category, 
-                    subject, location, description, status
-                ) VALUES (
-                    (SELECT id FROM students WHERE school_id = %s),
-                    %s, %s, %s, %s, %s, %s, 'Pending'
-                )
+                    student_id, category, subject, location, description, status
+                ) VALUES (%s, %s, %s, %s, %s, 'Pending')
             '''
             values = (
-                complaint_data['school_id'],
-                complaint_data['school_id'],
-                complaint_data['program'],
+                student['id'],
                 complaint_data['category'],
                 complaint_data['subject'],
                 complaint_data['location'],
@@ -377,15 +382,19 @@ class Database:
             return False, "Error submitting complaint.", None
 
     def get_student_complaints(self, school_id):
+        """
+        GET ALL COMPLAINTS FOR A STUDENT - JOINS WITH STUDENTS TABLE
+        """
         try:
             self._ensure_connection()
             query = '''
-                SELECT id, category, subject, location, status, 
-                    DATE_FORMAT(created_at, '%Y-%m-%d') as date,
-                    description
-                FROM complaints
-                WHERE school_id = %s
-                ORDER BY created_at DESC
+                SELECT c.id, c.category, c.subject, c.location, c.status, 
+                    DATE_FORMAT(c.created_at, '%Y-%m-%d') as date,
+                    c.description
+                FROM complaints c
+                INNER JOIN students s ON c.student_id = s.id
+                WHERE s.school_id = %s
+                ORDER BY c.created_at DESC
             '''
             self.cursor.execute(query, (school_id,))
             return self.cursor.fetchall()
@@ -395,13 +404,17 @@ class Database:
             return []
 
     def get_all_complaints(self):
+        """
+        GET ALL COMPLAINTS WITH STUDENT INFO - JOINS WITH STUDENTS TABLE
+        """
         try:
             self._ensure_connection()
             query = '''
-                SELECT c.id, c.school_id, c.program, c.subject, 
+                SELECT c.id, s.school_id, s.program, c.subject, 
                     c.status, DATE_FORMAT(c.created_at, '%Y-%m-%d') as date,
                     c.category, c.location, c.description
                 FROM complaints c
+                INNER JOIN students s ON c.student_id = s.id
                 ORDER BY c.created_at DESC
             '''
             self.cursor.execute(query)
@@ -474,16 +487,45 @@ class Database:
             self.connection.rollback()
             return False, "Error updating status."
 
+    def reset_student_password(self, school_id, email, new_password): #RESET PASSWORD FOR STUDENT ACCOUNT
+        try:
+            #VERIFY SCHOOL ID AND EMAIL MATCH
+            query = """
+                SELECT StudentID FROM students 
+                WHERE SchoolID = %s AND Email = %s
+            """
+            self.cursor.execute(query, (school_id, email))
+            result = self.cursor.fetchone()
+            
+            if not result:
+                return False, "School ID and email do not match our records."
+            
+            student_id = result[0]
+            
+            #UPDATE PASSWORD
+            update_query = """
+                UPDATE students 
+                SET Password = %s 
+                WHERE StudentID = %s
+            """
+            self.cursor.execute(update_query, (new_password, student_id))
+            self.conn.commit()
+            
+            return True, "Password reset successful! You can now login with your new password."
+            
+        except Exception as e:
+            self.conn.rollback()
+            return False, f"Error resetting password: {str(e)}"
+
     def _ensure_connection(self): #CHECK DATABASE CONNECTION
         try:
             if self.connection is None or not self.connection.is_connected():
                 print("⚠ Connection lost, reconnecting...")
                 self.connect()
                 return True
-            # Ping to verify connection is still alive
+            #PING TO KEEP CONNECTION ALIVE
             self.connection.ping(reconnect=True, attempts=3, delay=1)
             return True
         except Error as e:
             print(f"Connection check failed: {e}")
             return self.connect()
-        

@@ -48,6 +48,27 @@ class AuthValidator: #VALIDATOR FOR AUTH LOGIC
             return False, "Please enter a valid contact number."
         
         return True, None
+    
+    @staticmethod
+    def validate_password_reset(reset_data): #VALIDATE PASSWORD RESET DATA
+        if not reset_data.get('school_id'):
+            return False, "Please enter your School ID."
+        
+        if not reset_data.get('email'):
+            return False, "Please enter your email."
+        
+        email = reset_data['email']
+        if '@umindanao.edu.ph' not in email:
+            return False, "Please enter a valid school email."
+        
+        new_password = reset_data.get('new_password', '')
+        if len(new_password) < 6:
+            return False, "New password must be at least 6 characters long."
+        
+        if new_password != reset_data.get('confirm_password'):
+            return False, "Passwords do not match."
+        
+        return True, None
 
 
 class AuthService: #AUTHENTICATION SERVICE
@@ -87,3 +108,21 @@ class AuthService: #AUTHENTICATION SERVICE
             return True, f"Registration successful! Welcome, {student_data['first_name']}!"
         else:
             return False, message
+    
+    def reset_password(self, reset_data): #RESET PASSWORD FOR EXISTING STUDENT
+        
+        is_valid, error = self.validator.validate_password_reset(reset_data)
+        if not is_valid:
+            return False, error
+        
+        if not self.db.connect():
+            return False, "Database connection error."
+        
+        success, message = self.db.reset_student_password(
+            reset_data['school_id'],
+            reset_data['email'],
+            reset_data['new_password']
+        )
+        
+        self.db.close()
+        return success, message

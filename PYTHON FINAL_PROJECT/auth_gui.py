@@ -5,7 +5,7 @@
 
 from PyQt6.QtWidgets import (
     QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, 
-    QHBoxLayout, QWidget, QMessageBox, QComboBox, QScrollArea
+    QHBoxLayout, QWidget, QMessageBox, QComboBox, QScrollArea, QDialog
 )
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QFont
@@ -279,6 +279,7 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
     login_clicked = pyqtSignal(str, str)
     register_requested = pyqtSignal()
     admin_login_requested = pyqtSignal()
+    forgot_password_requested = pyqtSignal()
     
     def _on_admin_clicked(self):
         self.admin_login_requested.emit()
@@ -342,6 +343,29 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
         self.pass_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.pass_input)
         
+        #FORGOT PASSWORD LINK
+        forgot_layout = QHBoxLayout()
+        forgot_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
+        
+        self.forgot_btn = QPushButton("Forgot Password?")
+        self.forgot_btn.setFlat(True)
+        self.forgot_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.forgot_btn.clicked.connect(self._on_forgot_password_clicked)
+        self.forgot_btn.setStyleSheet(f"""
+            QPushButton {{
+                color: {ColorTheme.GOLDEN_AMBER};
+                text-decoration: underline;
+                background: transparent;
+                border: none;
+                font-size: 11px;
+            }}
+            QPushButton:hover {{
+                color: {ColorTheme.BTN_PRIMARY_HOVER};
+            }}
+        """)
+        forgot_layout.addWidget(self.forgot_btn)
+        layout.addLayout(forgot_layout)
+        
         layout.addSpacing(10)
         
     def _add_buttons(self, layout):
@@ -375,7 +399,7 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
             QPushButton:hover {{
                 color: {ColorTheme.BTN_PRIMARY_HOVER};
             }}
-        """)  # THEN STYLE
+        """)
         register_layout.addWidget(self.register_btn)
         
         layout.addLayout(register_layout)
@@ -388,6 +412,9 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
     def _on_register_clicked(self):
         self.register_requested.emit()
     
+    def _on_forgot_password_clicked(self):
+        self.forgot_password_requested.emit()
+    
     def show_error(self, title, message):
         QMessageBox.critical(self, title, message)
         
@@ -398,5 +425,115 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
         self.user_input.clear()
         self.pass_input.clear()
         self.user_input.setFocus()
+
+
+class ForgotPasswordDialog(QDialog):
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._setup_window()
+        self._setup_ui()
+        
+    def _setup_window(self):
+        self.setWindowTitle("Reset Password")
+        self.setFixedSize(400, 500)
+        self.setModal(True)
+        self.setStyleSheet(StyleSheet.get_main_window_style())
+        
+    def _setup_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setSpacing(8)
+        layout.setContentsMargins(30, 25, 30, 25)
+        
+        self._add_title(layout)
+        self._add_input_fields(layout)
+        self._add_buttons(layout)
+        
+    def _add_title(self, layout):
+        title = QLabel("Reset Your Password")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title_font = QFont()
+        title_font.setPointSize(14)
+        title_font.setBold(True)
+        title.setFont(title_font)
+        layout.addWidget(title)
+        
+        subtitle = QLabel("Enter your School ID and email to reset")
+        subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        subtitle.setStyleSheet("color: #666;")
+        layout.addWidget(subtitle)
+        
+        layout.addSpacing(15)
+        
+    def _add_input_fields(self, layout):
+        #SCHOOL ID FIELD
+        layout.addWidget(QLabel("School ID:"))
+        layout.addSpacing(2)
+        self.school_id_input = QLineEdit()
+        self.school_id_input.setPlaceholderText("Enter your School ID")
+        self.school_id_input.setMinimumHeight(40)
+        self.school_id_input.setStyleSheet(StyleSheet.get_input_style())
+        layout.addWidget(self.school_id_input)
+        layout.addSpacing(5)
+        
+        #EMAIL FIELD
+        layout.addWidget(QLabel("School Email:"))
+        layout.addSpacing(2)
+        self.email_input = QLineEdit()
+        self.email_input.setPlaceholderText("name.schoolid@umindanao.edu.ph")
+        self.email_input.setMinimumHeight(40)
+        self.email_input.setStyleSheet(StyleSheet.get_input_style())
+        layout.addWidget(self.email_input)
+        layout.addSpacing(5)
+        
+        #NEW PASSWORD FIELD
+        layout.addWidget(QLabel("New Password:"))
+        layout.addSpacing(2)
+        self.new_password_input = QLineEdit()
+        self.new_password_input.setPlaceholderText("Enter new password")
+        self.new_password_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.new_password_input.setMinimumHeight(40)
+        self.new_password_input.setStyleSheet(StyleSheet.get_input_style())
+        layout.addWidget(self.new_password_input)
+        layout.addSpacing(5)
+        
+        #CONFIRM PASSWORD FIELD
+        layout.addWidget(QLabel("Confirm Password:"))
+        layout.addSpacing(2)
+        self.confirm_password_input = QLineEdit()
+        self.confirm_password_input.setPlaceholderText("Re-enter new password")
+        self.confirm_password_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.confirm_password_input.setMinimumHeight(40)
+        self.confirm_password_input.setStyleSheet(StyleSheet.get_input_style())
+        layout.addWidget(self.confirm_password_input)
+        
+        layout.addSpacing(15)
+        
+    def _add_buttons(self, layout):
+        #RESET BUTTON
+        self.reset_btn = QPushButton("Reset Password")
+        self.reset_btn.setMinimumHeight(45)
+        self.reset_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.reset_btn.clicked.connect(self.accept)
+        self.reset_btn.setStyleSheet(StyleSheet.get_button_style("primary"))
+        layout.addWidget(self.reset_btn)
+        
+        layout.addSpacing(12)
+        
+        #CANCEL BUTTON
+        self.cancel_btn = QPushButton("Cancel")
+        self.cancel_btn.setMinimumHeight(45)
+        self.cancel_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.cancel_btn.clicked.connect(self.reject)
+        self.cancel_btn.setStyleSheet(StyleSheet.get_button_style("secondary"))
+        layout.addWidget(self.cancel_btn)
+        
+    def get_reset_data(self):
+        return {
+            'school_id': self.school_id_input.text().strip(),
+            'email': self.email_input.text().strip(),
+            'new_password': self.new_password_input.text(),
+            'confirm_password': self.confirm_password_input.text()
+        }
 
 
